@@ -1,2 +1,2 @@
 # simple-google-api
-Python simple Google API for non-technical users
+Python package simple Google API for non-technical users

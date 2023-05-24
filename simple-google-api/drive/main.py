@@ -226,7 +226,7 @@ def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None, to_folde
     copied = service.files().copy(fileId=file_id, body=body, fields = 'id, name, parents, owners').execute()
 
     if to_folder_id != None:
-        copied = service.files().update(fileId=file_id,
+        copied = service.files().update(fileId=copied['id'],
                                        addParents=to_folder_id,
                                        removeParents=copied['parents'][0],
                                        fields='id, name, parents, owners',

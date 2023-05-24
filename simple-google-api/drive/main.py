@@ -201,6 +201,7 @@ def move_file(creds, file_id, to_folder_id):
                            removeParents = remove_parents,
                            fields = 'id, name, parents, owners',
                            ).execute()
+    print(f'{file["name"]} has been moved to folder {to_folder_id}!')
     return moved
 
 def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None, to_folder_id=None):
@@ -232,7 +233,7 @@ def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None, to_folde
                                        fields='id, name, parents, owners',
                                        ).execute()
 
-    print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]}) {", folder" + to_folder_id if to_folder_id != None else ""}!')
+    print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]}) {", folder " + to_folder_id if to_folder_id != None else ""}!')
     return copied
 
 

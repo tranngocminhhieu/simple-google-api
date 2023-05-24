@@ -63,16 +63,13 @@ def build_gauth_from_client_secrets(client_secrets_file='client_secrets.json', s
     return gauth
 
 def create_folder(creds, new_folder_name, parent_folder_id=None):
-    """
-    Create a folder and prints the folder ID
-    Returns : Folder Id
+    '''
 
-    Need to build creds with drive_documents_scopes
-
-    Load pre-authorized user credentials from the environment.
-    TODO(developer) - See https://developers.google.com/identity
-    for guides on implementing OAuth2 for the application.
-    """
+    :param creds: Use build creds functions
+    :param new_folder_name: string
+    :param parent_folder_id: Without parent_folder_id new folder will be created in My Drive
+    :return: folder_id
+    '''
 
     try:
         # create drive api client
@@ -104,8 +101,12 @@ def create_folder(creds, new_folder_name, parent_folder_id=None):
 
 def upload_file(gauth, local_file, folder_id=None, rename=None):
     '''
-    Without rename, local_file will be used as file name.
-    Without folder_id, file will be uploaded to My Drive.
+
+    :param gauth: Use build gauth functions
+    :param local_file: Local file path
+    :param folder_id: Without folder_id, file will be uploaded to My Drive.
+    :param rename: Without rename, local_file will be used as file name.
+    :return: No
     '''
     drive = GoogleDrive(gauth)
 
@@ -119,6 +120,11 @@ def upload_file(gauth, local_file, folder_id=None, rename=None):
     print(f'Upload {local_file}{" as " + rename if rename != None else ""} to {"Drive folder " + folder_id if folder_id != None else "My Drive"} successfully!')
 
 def check_usage(creds):
+    '''
+
+    :param creds: Use build creds functions
+    :return: A usage information json
+    '''
     service = build('drive', 'v3', credentials=creds)
     result = service.about().get(fields="*").execute()
     result = result.get("storageQuota", {})
@@ -126,6 +132,13 @@ def check_usage(creds):
 
 
 def list_files(gauth, title_contains=None, owner_email=None):
+    '''
+
+    :param gauth: Use build gauth functions
+    :param title_contains: string
+    :param owner_email: Exactly email
+    :return: A list of files, you can use Pandas to convert it to a data frame
+    '''
     # https://stackoverflow.com/questions/56857760/list-of-files-in-a-google-drive-folder-with-python
     # https://stackoverflow.com/questions/61242051/google-drive-api-list-files-based-on-owners-in-shared-drive#comment108382909_61245232
     drive = GoogleDrive(gauth)
@@ -145,6 +158,12 @@ def list_files(gauth, title_contains=None, owner_email=None):
     return listed
 
 def delete_file(creds, file_id):
+    '''
+
+    :param creds: Use build creds functions with drive scope
+    :param file_id: ID in URL or use list_files function to get
+    :return: No
+    '''
     service = build('drive', 'v3', credentials=creds)
     service.files().delete(fileId=file_id).execute()
     print(f'{file_id} has been deleted!')

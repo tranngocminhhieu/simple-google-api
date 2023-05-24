@@ -192,18 +192,29 @@ def delete_file(creds, file_id):
     service.files().delete(fileId=file_id).execute()
     print(f'{file_id} has been deleted!')
 
+def move_file(creds, file_id, to_folder_id):
+    service = build('drive', 'v3', credentials=creds)
+    file = service.files().get(fileId=file_id, fields='id, name, parents').execute()
+    remove_parents = file['parents'][0]
+    moved = service.files().update(fileId = file_id,
+                           addParents= to_folder_id,
+                           removeParents = remove_parents,
+                           fields = 'id, name, parents, owners',
+                           ).execute()
+    return moved
 
-def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None):
+def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None, to_folder_id=None):
     '''
     :param creds: Use build creds functions with drive scope
     :param file_id: ID in URL or use list_files function to get
     :param same_name: True = same old name, False = Copy of ...
-    :param prefix: Add string at the begin of old name, same_name have to = True
-    :param suffix: Add string at the end of old name, same_name have to = True
+    :param prefix: Add string at the begin of old name (space already), same_name have to = True
+    :param suffix: Add string at the end of old name (space already), same_name have to = True
+    :param to_folder_id: None = same folder, id string = copy to specific folder
     :return: New file information json
     '''
     service = build('drive', 'v3', credentials=creds)
-    old_file = service.files().get(fileId=file_id).execute()
+    old_file = service.files().get(fileId=file_id, fields = 'id, name, parents, owners').execute()
 
     if same_name==True:
         new_name = f'{str(prefix) + " " if prefix != None else ""}{old_file["name"]}{" " + str(suffix) if suffix != None else ""}'
@@ -211,17 +222,30 @@ def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None):
         new_name = f'Copy of {old_file["name"]}'
 
     body = {'name': new_name}
-    copied = service.files().copy(fileId=file_id, body=body).execute()
-    print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]})!')
+
+    copied = service.files().copy(fileId=file_id, body=body, fields = 'id, name, parents, owners').execute()
+
+    if to_folder_id != None:
+        copied = service.files().update(fileId=file_id,
+                                       addParents=to_folder_id,
+                                       removeParents=copied['parents'][0],
+                                       fields='id, name, parents, owners',
+                                       ).execute()
+
+    print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]}) {", folder" + to_folder_id if to_folder_id != None else ""}!')
     return copied
 
 
 def rename_file(creds, file_id, new_name):
+    '''
+
+    :param creds: Use build creds functions with drive scope
+    :param file_id: string
+    :param new_name: string
+    :return: New file information json
+    '''
     service = build('drive', 'v3', credentials=creds)
     body = {'name': new_name}
-    result = service.files().update(fileId=file_id, body=body).execute()
+    result = service.files().update(fileId=file_id, body=body, fields = 'id, name, parents, owners').execute()
     print(f'{file_id} has been renamed to {new_name}!')
     return result
-
-def move_file(creds, file_id, folder_id):
-    pass

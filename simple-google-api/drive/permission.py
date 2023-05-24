@@ -1,6 +1,6 @@
 from .main import copy_file, delete_file
 
-def transfer_owner_by_copy(creds_from, creds_to, file_id):
+def transfer_owner_by_copy(creds_from, creds_to, file_id, same_name=True):
     '''
     Copy the old file to a new file > Delete the old file
     :param creds_from: Use build creds functions
@@ -8,7 +8,7 @@ def transfer_owner_by_copy(creds_from, creds_to, file_id):
     :param file_id: ID in URL or use list_files function to get
     :return: New file information json
     '''
-    result = copy_file(creds=creds_to, file_id=file_id)
+    result = copy_file(creds=creds_to, file_id=file_id, same_name=same_name)
     result['deleted_file'] = file_id
     delete_file(creds=creds_from, file_id=file_id)
     return result

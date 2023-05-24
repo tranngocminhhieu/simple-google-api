@@ -193,21 +193,35 @@ def delete_file(creds, file_id):
     print(f'{file_id} has been deleted!')
 
 
-def copy_file(creds, file_id):
+def copy_file(creds, file_id, same_name=True, prefix=None, suffix=None):
     '''
-
     :param creds: Use build creds functions with drive scope
     :param file_id: ID in URL or use list_files function to get
+    :param same_name: True = same old name, False = Copy of ...
+    :param prefix: Add string at the begin of old name, same_name have to = True
+    :param suffix: Add string at the end of old name, same_name have to = True
     :return: New file information json
     '''
     service = build('drive', 'v3', credentials=creds)
-    copied = service.files().copy(fileId=file_id).execute()
-    print(f'[{copied["name"]}] {file_id} has been copied to {copied["id"]}!')
+    old_file = service.files().get(fileId=file_id).execute()
+
+    if same_name==True:
+        new_name = f'{str(prefix) + " " if prefix != None else ""}{old_file["name"]}{" " + str(suffix) if suffix != None else ""}'
+    else:
+        new_name = f'Copy of {old_file["name"]}'
+
+    body = {'name': new_name}
+    copied = service.files().copy(fileId=file_id, body=body).execute()
+    print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]})!')
     return copied
 
 
-def move_file(creds, file_id, folder_id):
-    pass
+def rename_file(creds, file_id, new_name):
+    service = build('drive', 'v3', credentials=creds)
+    body = {'name': new_name}
+    result = service.files().update(fileId=file_id, body=body).execute()
+    print(f'{file_id} has been renamed to {new_name}!')
+    return result
 
-def rename_file(creds, file_id):
+def move_file(creds, file_id, folder_id):
     pass

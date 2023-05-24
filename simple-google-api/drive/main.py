@@ -8,8 +8,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from oauth2client.service_account import ServiceAccountCredentials
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
 
 drive_scopes = ["https://www.googleapis.com/auth/drive"]
 drive_documents_scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']

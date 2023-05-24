@@ -15,10 +15,23 @@ drive_scopes = ["https://www.googleapis.com/auth/drive"]
 drive_documents_scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
 
 def build_creds_from_service_account(scopes, google_sa_json):
+    '''
+
+    :param scopes: drive_scopes or drive_documents_scopes
+    :param google_sa_json: Json (dict), not file
+    :return: creds
+    '''
     creds = service_account.Credentials.from_service_account_info(google_sa_json, scopes=scopes)
     return creds
 
 def build_creds_from_client_secrets(scopes, client_secrets_file='client_secrets.json', save_token_file='token.json'):
+    '''
+
+    :param scopes: drive_scopes or drive_documents_scopes
+    :param client_secrets_file: It should be .json
+    :param save_token_file: It should be .json
+    :return: creds
+    '''
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -38,12 +51,23 @@ def build_creds_from_client_secrets(scopes, client_secrets_file='client_secrets.
     return creds
 
 def build_gauth_from_service_account(google_sa_json):
+    '''
+
+    :param google_sa_json: Json (dict), not file
+    :return: gauth
+    '''
     gauth = GoogleAuth()
     scopes = ["https://www.googleapis.com/auth/drive"]
     gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(google_sa_json, scopes)
     return gauth
 
 def build_gauth_from_client_secrets(client_secrets_file='client_secrets.json', save_creds_file='mycreds.txt'):
+    '''
+
+    :param client_secrets_file: It should be .json
+    :param save_creds_file: It should be .txt
+    :return: gauth
+    '''
     # https://stackoverflow.com/questions/46978784/pydrive-google-drive-automate-authentication
     gauth = GoogleAuth()
     gauth.DEFAULT_SETTINGS['client_config_file'] = client_secrets_file

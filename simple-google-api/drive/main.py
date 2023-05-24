@@ -159,7 +159,7 @@ def copy_file(creds, file_id):
     '''
     service = build('drive', 'v3', credentials=creds)
     copied = service.files().copy(fileId=file_id).execute()
-    print(f'{file_id} has been copied to {copied["id"]} | {copied["name"]}!')
+    print(f'[{copied["name"]}] {file_id} has been copied to {copied["id"]}!')
     return copied
 
 def transfer_owner_by_copy(creds_from, creds_to, file_id):

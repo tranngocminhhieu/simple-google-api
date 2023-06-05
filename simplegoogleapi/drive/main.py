@@ -66,29 +66,41 @@ def build_gauth_from_client_secrets(client_secrets_file='client_secrets.json', s
     '''
 
     :param client_secrets_file: It should be .json
-    :param save_creds_file: It should be .txt
+    :param save_creds_file: It should be .json
     :return: gauth
     '''
     # https://stackoverflow.com/questions/46978784/pydrive-google-drive-automate-authentication
     gauth = GoogleAuth()
-    gauth.DEFAULT_SETTINGS['client_config_file'] = client_secrets_file
-    # Try to load saved client credentials
-    gauth.LoadCredentialsFile(save_creds_file)
-    if gauth.credentials is None:
 
+    gauth.DEFAULT_SETTINGS['client_config_file'] = client_secrets_file
+
+    # Try to load saved credentials
+    gauth.LoadCredentialsFile(save_creds_file)
+
+    # If the file does not exist -> Start new authentication
+    if gauth.credentials is None:
         # This is what solved the issues: https://stackoverflow.com/a/55876179
         gauth.GetFlow()
         gauth.flow.params.update({'access_type': 'offline'})
         gauth.flow.params.update({'approval_prompt': 'force'})
-
-        # Authenticate if they're not there
         gauth.LocalWebserverAuth()
+
+    # If the file exist but token has expired -> Try to refresh. If it can not be refreshed -> Start new authentication
     elif gauth.access_token_expired:
-        # Refresh them if expired
-        gauth.Refresh()
+        try:
+            # Refresh them if expired
+            gauth.Refresh()
+        except:
+            gauth.GetFlow()
+            gauth.flow.params.update({'access_type': 'offline'})
+            gauth.flow.params.update({'approval_prompt': 'force'})
+            gauth.LocalWebserverAuth()
+
+    # If the file exists and has not expired -> Authorize the credentials by the file
     else:
         # Initialize the saved creds
         gauth.Authorize()
+
     # Save the current credentials to a file
     gauth.SaveCredentialsFile(save_creds_file)
     return gauth

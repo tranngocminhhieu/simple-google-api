@@ -3,4 +3,4 @@ from .main import build_gauth_from_client_secrets, build_gauth_from_service_acco
 from .main import get_gauth_from_raw
 from .main import drive_scopes, drive_documents_scopes
 from .main import SimpleDrive
-from .permission import transfer_owner_by_copy
+from .help import transfer_owner_by_copy

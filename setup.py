@@ -5,7 +5,7 @@ README = (Path(__file__).parent / "README.md").read_text()
 
 setup(
     name='simplegoogleapi',
-    version='0.1.0',
+    version='0.1.1',
     description='A simple way to work with Google API',
     long_description=README,
     long_description_content_type="text/markdown",

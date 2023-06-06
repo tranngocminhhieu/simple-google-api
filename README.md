@@ -27,7 +27,7 @@ pip install git+https://github.com/tranngocminhhieu/simple-googl-eapi.git
 Upgrade to the latest version.
 
 ```
-pip install git+https://github.com/tranngocminhhieu/simple-google-api --upgrade
+pip install git+https://github.com/tranngocminhhieu/simple-google-api.git --upgrade
 ```
 
 ## How to use SimpleDrive

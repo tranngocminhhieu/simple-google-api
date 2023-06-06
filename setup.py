@@ -13,7 +13,7 @@ setup(
     author='Tran Ngoc Minh Hieu',
     author_email='tnmhieu@gmail.com',
     packages=['simplegoogleapi'],
-    # package_data={'simplegoogleapi': ['data/*']},
+    package_data={'simplegoogleapi': ['auth/*', 'drive/*']},
     install_requires=[
         'requests',
         'pydrive2',

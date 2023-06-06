@@ -1,5 +1,6 @@
 import os
 import os.path
+import json
 
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
@@ -11,111 +12,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 import requests
-
-drive_scopes = ["https://www.googleapis.com/auth/drive"]
-drive_documents_scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
-
-def build_creds_from_service_account(scopes, google_sa_json):
-    '''
-
-    :param scopes: drive_scopes or drive_documents_scopes
-    :param google_sa_json: Json (dict), not file
-    :return: creds
-    '''
-    creds = service_account.Credentials.from_service_account_info(google_sa_json, scopes=scopes)
-    return creds
-
-def build_creds_from_client_secrets(scopes, client_secrets_file='client_secrets.json', save_token_file='token.json'):
-    '''
-
-    :param scopes: drive_scopes or drive_documents_scopes
-    :param client_secrets_file: It should be .json
-    :param save_token_file: It should be .json
-    :return: creds
-    '''
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists(save_token_file):
-        creds = Credentials.from_authorized_user_file(save_token_file, scopes)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(client_secrets_file, scopes)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(save_token_file, 'w') as token:
-            token.write(creds.to_json())
-    return creds
-
-def build_gauth_from_service_account(google_sa_json):
-    '''
-
-    :param google_sa_json: Json (dict), not file
-    :return: gauth
-    '''
-    gauth = GoogleAuth()
-    scopes = ["https://www.googleapis.com/auth/drive"]
-    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(google_sa_json, scopes)
-    return gauth
-
-def build_gauth_from_client_secrets(client_secrets_file='client_secrets.json', save_creds_file='credentials.json'):
-    '''
-
-    :param client_secrets_file: It should be .json
-    :param save_creds_file: It should be .json
-    :return: gauth
-    '''
-    # https://stackoverflow.com/questions/46978784/pydrive-google-drive-automate-authentication
-    gauth = GoogleAuth()
-
-    gauth.DEFAULT_SETTINGS['client_config_file'] = client_secrets_file
-
-    # Try to load saved credentials
-    gauth.LoadCredentialsFile(save_creds_file)
-
-    # If the file does not exist -> Start new authentication
-    if gauth.credentials is None:
-        # This is what solved the issues: https://stackoverflow.com/a/55876179
-        gauth.GetFlow()
-        gauth.flow.params.update({'access_type': 'offline'})
-        gauth.flow.params.update({'approval_prompt': 'force'})
-        gauth.LocalWebserverAuth()
-
-    # If the file exist but token has expired -> Try to refresh. If it can not be refreshed -> Start new authentication
-    elif gauth.access_token_expired:
-        try:
-            # Refresh them if expired
-            gauth.Refresh()
-        except:
-            gauth.GetFlow()
-            gauth.flow.params.update({'access_type': 'offline'})
-            gauth.flow.params.update({'approval_prompt': 'force'})
-            gauth.LocalWebserverAuth()
-
-    # If the file exists and has not expired -> Authorize the credentials by the file
-    else:
-        # Initialize the saved creds
-        gauth.Authorize()
-
-    # Save the current credentials to a file
-    gauth.SaveCredentialsFile(save_creds_file)
-    return gauth
-
-def get_gauth_from_raw(client_secrets_raw=None, credentials_raw=None, save_client_secrets_file='client_secrets.json', save_creds_file='credentials.json'):
-    if client_secrets_raw != None:
-        client_secrets = requests.get(client_secrets_raw).text
-        with open(save_client_secrets_file, 'w') as f:
-            f.write(client_secrets)
-        print('Client secrets has been saved!')
-    if credentials_raw != None:
-        credentials = requests.get(credentials_raw).text
-        with open(save_creds_file, 'w') as f:
-            f.write(credentials)
-        print('Credentials has been saved!')
 
 
 class SimpleDrive:

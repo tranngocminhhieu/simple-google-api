@@ -1,17 +1,9 @@
 import os
 import os.path
-import json
 
-from google.auth.transport.requests import Request
-from google.oauth2 import service_account
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from oauth2client.service_account import ServiceAccountCredentials
-from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
-import requests
 
 
 class SimpleDrive:
@@ -48,7 +40,7 @@ class SimpleDrive:
 
                 # pylint: disable=maybe-no-member
             file = self.service.files().create(body=file_metadata, fields='id'
-                                          ).execute()
+                                               ).execute()
             print(F'Folder has created with ID: "{file.get("id")}".')
 
         except HttpError as error:
@@ -74,7 +66,8 @@ class SimpleDrive:
 
         file.SetContentFile(local_file)
         file.Upload()
-        print(f'Upload {local_file}{" as " + rename if rename != None else ""} to {"Drive folder " + folder_id if folder_id != None else "My Drive"} successfully!')
+        print(
+            f'Upload {local_file}{" as " + rename if rename != None else ""} to {"Drive folder " + folder_id if folder_id != None else "My Drive"} successfully!')
 
     def check_usage(self):
         '''
@@ -124,11 +117,11 @@ class SimpleDrive:
     def move_file(self, file_id, to_folder_id):
         file = self.service.files().get(fileId=file_id, fields='id, name, parents').execute()
         remove_parents = file['parents'][0]
-        moved = self.service.files().update(fileId = file_id,
-                               addParents= to_folder_id,
-                               removeParents = remove_parents,
-                               fields = 'id, name, parents, owners',
-                               ).execute()
+        moved = self.service.files().update(fileId=file_id,
+                                            addParents=to_folder_id,
+                                            removeParents=remove_parents,
+                                            fields='id, name, parents, owners',
+                                            ).execute()
         print(f'{file["name"]} has been moved to folder {to_folder_id}!')
         return moved
 
@@ -142,27 +135,27 @@ class SimpleDrive:
         :param to_folder_id: None = same folder, id string = copy to specific folder
         :return: New file information json
         '''
-        old_file = self.service.files().get(fileId=file_id, fields = 'id, name, parents, owners').execute()
+        old_file = self.service.files().get(fileId=file_id, fields='id, name, parents, owners').execute()
 
-        if same_name==True:
+        if same_name == True:
             new_name = f'{str(prefix) + " " if prefix != None else ""}{old_file["name"]}{" " + str(suffix) if suffix != None else ""}'
         else:
             new_name = f'Copy of {old_file["name"]}'
 
         body = {'name': new_name}
 
-        copied = self.service.files().copy(fileId=file_id, body=body, fields = 'id, name, parents, owners').execute()
+        copied = self.service.files().copy(fileId=file_id, body=body, fields='id, name, parents, owners').execute()
 
         if to_folder_id != None:
             copied = self.service.files().update(fileId=copied['id'],
-                                           addParents=to_folder_id,
-                                           removeParents=copied['parents'][0],
-                                           fields='id, name, parents, owners',
-                                           ).execute()
+                                                 addParents=to_folder_id,
+                                                 removeParents=copied['parents'][0],
+                                                 fields='id, name, parents, owners',
+                                                 ).execute()
 
-        print(f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]}) {", folder " + to_folder_id if to_folder_id != None else ""}!')
+        print(
+            f'{old_file["name"]} ({file_id}) has been copied to {body["name"]} ({copied["id"]}) {", folder " + to_folder_id if to_folder_id != None else ""}!')
         return copied
-
 
     def rename_file(self, file_id, new_name):
         '''
@@ -173,7 +166,7 @@ class SimpleDrive:
         :return: New file information json
         '''
         body = {'name': new_name}
-        result = self.service.files().update(fileId=file_id, body=body, fields = 'id, name, parents, owners').execute()
+        result = self.service.files().update(fileId=file_id, body=body, fields='id, name, parents, owners').execute()
         print(f'{file_id} has been renamed to {new_name}!')
         return result
 
@@ -188,7 +181,6 @@ class SimpleDrive:
         permission = {'type': 'user', 'role': role, 'emailAddress': email}
         self.service.permissions().create(fileId=file_id, body=permission).execute()
         print(f'{email} has been added {role} permission to file_id {file_id}')
-
 
     def delete_permission(self, file_id, permission_id=None, email=None):
         '''
@@ -206,7 +198,6 @@ class SimpleDrive:
             if email not in [i['emailAddress'] for i in list_permission]:
                 print(f'{email} not in permissions for file_id {file_id}')
             else:
-                permission_id = [i['id'] for i in list_permission if i['emailAddress']==email][0]
+                permission_id = [i['id'] for i in list_permission if i['emailAddress'] == email][0]
                 self.service.permissions().delete(fileId=file_id, permissionId=permission_id).execute()
                 print(f'{email} has been removed permission from file_id {file_id}')
-

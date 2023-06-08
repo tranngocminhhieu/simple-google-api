@@ -161,3 +161,4 @@ cython_debug/
 test.py
 notebook/client_secrets.json
 notebook/credentials.json
+notebook/test.ipynb
